@@ -1,0 +1,148 @@
+#-------------------------------------------
+
+record(stringin, "$(P)$(R):IPADDR_RBV") {
+}
+
+record(stringin, "$(P)$(R):DATAFILE_DIR") {
+}
+
+record(stringin, "$(P)$(R):TMP_DATAFILE_DIR") {
+}
+
+record(stringin, "$(P)$(R):FNAM_RBV") {
+}
+
+record(longin, "$(P)$(R):FSIZ") {
+    field("EGU", "MB")
+}
+
+record(longin, "$(P)$(R):FSIZ_RBV") {
+    field("EGU", "MB")
+}
+
+record(longin, "$(P)$(R):RUNNO_RBV") {
+}
+
+record(longin, "$(P)$(R):NELM_RBV") {
+}
+
+record(longin, "$(P)$(R):MONCH_RBV") {
+}
+
+record(stringin, "$(P)$(R):DATA_FILENAME") {
+}
+
+record(stringin, "$(P)$(R):SPEC_FILENAME") {
+}
+
+#-------------------------------------------
+
+record(longin, "$(P)$(R):PID") {
+}
+
+record(stringin, "$(P)$(R):HOSTNAME") {
+}
+
+record(stringin, "$(P)$(R):DIR") {
+}
+
+#-------------------------------------------
+
+#record(mbbi, "$(P)$(R):SCANSTATUS") {
+#    field("ZRVL", 0)
+#    field("ONVL", 1)
+#    field("TWVL", 2)
+#    field("ZRST", "Idle")
+#    field("ONST", "Stage")
+#    field("TWST", "Scan")
+#}
+
+#-------------------------------------------
+
+#record(longin, "$(P)$(R):HEARTBEAT") {
+#}
+
+record(calc, "$(P)$(R):WATCHDOG") {
+    field(INPA, "$(P)$(R):WATCHDOG")
+    field(CALC, "A+1")
+    field(FLNK, "$(P)$(R):ONLINE")
+    field(SCAN, "1 second")
+}
+
+record(longin, "$(P)$(R):TOLERANCE") {
+    field(VAL, 5)
+}
+
+
+record(calc, "$(P)$(R):ONLINE") {
+    field(INPA, "$(P)$(R):WATCHDOG")
+    field(INPB, "$(P)$(R):TOLERANCE")
+    field(CALC, "(A<B)?1:0")
+}
+
+
+#-------------------------------------------
+
+record(waveform, "$(P)$(R):MCA") {
+    field(NELM, $(NELM_MCA))
+    field(FTVL, USHORT)
+}
+
+record(waveform, "$(P)$(R):TDC") {
+    field(NELM, $(NELM_TDC))
+    field(FTVL, USHORT)
+}
+
+#-------------------------------------------
+
+record(bi, "$(P)$(R):TSEN_PROC") {
+    field(ZNAM, "Idle")
+    field(ONAM, "Process")
+}
+
+record(bi, "$(P)$(R):CHEN_PROC") {
+    field(ZNAM, "Idle")
+    field(ONAM, "Process")
+}
+
+record(mbbi, "$(P)$(R):TSEN_CTRL") {
+    field("ZRVL", 0)
+    field("ONVL", 1)
+    field("TWVL", 2)
+    field("THVL", 3)
+    field("ZRST", "Enable")
+    field("ONST", "Enable All")
+    field("TWST", "Disable")
+    field("THST", "Disable All")
+}
+
+record(mbbi, "$(P)$(R):CHEN_CTRL") {
+    field("ZRVL", 0)
+    field("ONVL", 1)
+    field("TWVL", 2)
+    field("THVL", 3)
+    field("ZRST", "Enable")
+    field("ONST", "Enable All")
+    field("TWST", "Disable")
+    field("THST", "Disable All")
+}
+
+#-------------------------------------------
+
+record(calc, "$(P)$(R):TIME_LEFT")
+{
+    field(INPA, "$(P)$(R).CNT")
+    field(INPB, "$(P)$(R).TP")
+    field(INPC, "$(P)$(R):TIME_LEFT")
+    field(CALC, "(A=0) ? B : ((C>0) ? (C-1) : 0)")
+    field(SCAN, "1 second")
+}
+
+
+record(dfanout, "$(P)$(R):CLEAR-IOC-WATCHDOG") {
+  field(OUTA, "$(P)$(R):IOC-WATCHDOG.VAL PP")
+  field(DOL,  0)
+  field(SCAN, "1 second")
+  field(OMSL, "closed_loop")
+}
+

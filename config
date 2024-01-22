@@ -1,0 +1,4 @@
+NAME=Mars_DDM
+USER=softioc
+HOST=xf27id1-germ1
+PORT=5000

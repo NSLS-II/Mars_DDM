@@ -1,0 +1,4 @@
+epicsEnvSet("P",    "det")
+epicsEnvSet("R",    "1")
+epicsEnvSet("NELM", 192)
+

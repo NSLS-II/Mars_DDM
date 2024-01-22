@@ -1,0 +1,264 @@
+Globals 11 0= 00000000, 01000000, 00000000, 00000010, 
+Globals 11 1= 00000000, 00000000, 01101001, 00000000, 
+channels 11 0 = 00010000, 00010001, 00000001, 00010000, 
+channels 11 1 = 00000001, 00010000, 00010001, 00000001, 
+channels 11 2 = 00010001, 00000001, 00010000, 00010001, 
+channels 11 3 = 00010000, 00010001, 00000001, 00010000, 
+channels 11 4 = 00000001, 00010000, 00010001, 00000001, 
+channels 11 5 = 00010001, 00000001, 00010000, 00010001, 
+channels 11 6 = 00010000, 00010001, 00000001, 00010000, 
+channels 11 7 = 00000001, 00010000, 00010001, 00000001, 
+channels 11 8 = 00010001, 00000001, 00010000, 00010001, 
+channels 11 9 = 00010000, 00010001, 00000001, 00010000, 
+channels 11 10 = 00000001, 00010000, 00010001, 00000001, 
+channels 11 11 = 00010001, 00000001, 00010000, 00010001,
+
+
+Globals 11 1= 00000000, 00000000, 01101001, 00000000, 
+channels 11 0 = 00010000, 00010001, 00000001, 00010000, 
+channels 11 1 = 00000001, 00010000, 00010001, 00000001, 
+channels 11 2 = 00010001, 00000001, 00010000, 00010001, 
+channels 11 3 = 00010000, 00010001, 00000001, 00010000, 
+channels 11 4 = 00000001, 00010000, 00010001, 00000001, 
+channels 11 5 = 00010001, 00000001, 00010000, 00010001, 
+channels 11 6 = 00010000, 00010001, 00000001, 00010000, 
+channels 11 7 = 00000001, 00010000, 00010001, 00000001, 
+channels 11 8 = 00010001, 00000001, 00010000, 00010001, 
+channels 11 9 = 00010000, 00010001, 00000001, 00010000, 
+channels 11 10= 00000001, 00010000, 00010001, 00000001, 
+channels 11 11= 00010001, 00010001, 00010000, 00010001,
+
+
+380 = 101111100
+102 = 1100110
+
+MARS MSW: 7C011368
+MARS Mid 13: CCBE0800
+mars int2 : 80080080
+mars int2 : 08008008
+mars int2 : 00800800
+mars int2 : 80080080
+mars int2 : 08008008
+mars int2 : 00800800
+mars int2 : 80080080
+mars int2 : 08008008
+mars int2 : 00800800
+mars int2 : 80080080
+mars int2 : 08008008
+mars int2 : 00800000
+
+tree changes_2:
+  parameter: Global parameters.PA0:PA9
+  change:    value
+  data:      1023
+  ----------
+MARS MSW: 7C011368
+MARS Mid 13: CDFF8800
+mars int2 : 80080080
+mars int2 : 08008008
+mars int2 : 00800800
+mars int2 : 80080080
+mars int2 : 08008008
+mars int2 : 00800800
+mars int2 : 80080080
+mars int2 : 08008008
+mars int2 : 00800800
+mars int2 : 80080080
+mars int2 : 08008008
+mars int2 : 00800000
+
+tree changes:
+  parameter: Channel parameters.Ch0.ST
+  change:    value
+  data:      True
+  ----------
+MARS MSW: 7C011368
+MARS Mid 13: CDFF8800
+mars int2 : 80080080
+mars int2 : 08008008
+mars int2 : 00800800
+mars int2 : 80080080
+mars int2 : 08008008
+mars int2 : 00800800
+mars int2 : 80080080
+mars int2 : 08008008
+mars int2 : 00800800
+mars int2 : 80080080
+mars int2 : 08008008
+mars int2 : 04800000
+
+int pa;		380	0101111100	    	/* Threshold dac */
+int pb;		102	0001100110	     	/*Test pulse dac */
+char rm;	1	1	   /* Readout mods; 1=synch, 0=asynch */
+char senfl1;	0	0	   /* Lock on peak found */
+char senfl2;	1	1	   /* Lock on threshold */
+char m0;	1	1	   /* 1=channel mon, 0=others */
+char m1;	0	0	   /* 1=pk det on PD/PN; 0=other mons on PD/PN */
+char sbn;	1	1	   /* enable buffer on pdn & mon outputs */
+char sb;	1	1	   /* enable buffer on pd & mon outputs */
+char sl;	0	0	   /* 0=internal 2pA leakage, 1=disabled */
+char ts;	2	10	   /* Shaping time */
+char rt;	0	0	   /* 1=timing ramp duration x 3 */
+char spur;	0	0	   /* 1=enable pileup rejector */
+char sse;	0	0	   /* 1=enable multiple-firing suppression */
+char tr;	1	01	   /* timing ramp adjust */
+char ss;	0	00	   /* multiple firing time adjust */
+char c;		0	00000 	   /* m0=0,Monitor select. m0=1, channel being monitored */
+char g;		2	10 	   /* Gain select */
+char slh;	1	1	   /* internal leakage adjust */
+char sp;	1	1	   /* Input polarity; 1=positive, 0=negative */
+char saux;	1	1	   /* Enable monitor output */
+char sbm;	1	1	   /* Enable output monitor buffer */
+char tm;	1	1		/* Timing mode; 0=ToA, 1=ToT */ 
+
+
+110011010110110100000100000001011111	
+
+       channelstr[i*32+j].dp=15;	       /* Pileup rejector trim dac */
+       channelstr[i*32+j].nc1=0;	       /* no connection, set 0 */
+       channelstr[i*32+j].da=5;	       /* Threshold trim dac */
+       channelstr[i*32+j].sel=1;	 /* 1=leakage current, 0=shaper output */
+       channelstr[i*32+j].nc2=0;	 /* no connection, set 0 */
+       channelstr[i*32+j].sm=1;	       /* 1=channel disable */
+       channelstr[i*32+j].st=0;	       /* 1=enable test input (30fF cap) */
+
+
+7ad78000
+
+0   1111  0   1  0   1  101  0  1111 000 0000 0000 0000
+nc1  dp  st  sm nc2 sel  da nc1  dp
+
+globalstr[i].pa=1023;		/* Threshold dac */
+globalstr[i].pb=0;	      /* Test pulse dac */
+globalstr[i].rm=1;	      /* Readout mods; 1=synch, 0=asynch */
+globalstr[i].senfl1=0;       /* Lock on peak found */
+globalstr[i].senfl2=1;       /* Lock on threshold */
+globalstr[i].m0=0;	      /* 1=channel mon, 0=others */
+globalstr[i].m1=1;	      /* 1=pk det on PD/PN; 0=other mons on PD/PN */
+globalstr[i].sbn=0;	      /* enable buffer on pdn & mon outputs */
+globalstr[i].sb=1;	      /* enable buffer on pd & mon outputs */
+globalstr[i].sl=0;	      /* 0=internal 2pA leakage, 1=disabled */
+globalstr[i].ts=1;	      /* Shaping time */
+globalstr[i].rt=0;	      /* 1=timing ramp duration x 3 */
+globalstr[i].spur=1; 	      /* 1=enable pileup rejector */
+globalstr[i].sse-0;  	      /* 1=enable multiple-firing suppression */
+globalstr[i].tr=1;	      /* timing ramp adjust */
+globalstr[i].ss=2;	      /* multiple firing time adjust */
+globalstr[i].c=31;	      /* m0=0,Monitor select. m0=1, channel being monitored */
+globalstr[i].g=1;	      /* Gain select */
+globalstr[i].slh=0;  	      /* internal leakage adjust */
+globalstr[i].sp=1;	      /* Input polarity; 1=positive, 0=negative */
+globalstr[i].saux=0; 	      /* Enable monitor output */
+globalstr[i].sbm=1;  	      /* Enable output monitor buffer */
+globalstr[i].tm=0;	      /* Timing mode; 0=ToA, 1=ToT */
+
+1ffad7a
+
+0000000 1111111111 0  1   0    1    101   0   1111   0    1   0
+  pb         pa    st sm  nc2 sel    da  nc1   dp    st   sm nc2
+
+
+1  0   0   0   0    100   0   1000   0    0  0   0   100   0   1000 0   0  0  0   100
+dp st sm  nc2 sel    da  nc1   dp    st   sm nc2 sel  da  nc1   dp  st sm nc2 sel  da
+
+7C011368
+
+0   1   1   1   1   10 00000 00 01 0    0   0  10  0   11 0 1 1 0 1 000
+tm sbm saux sp slh  g    c   ss tr sse spur rt ts  sl 
+
+CCBE2802
+
+1100110 0101111100 0  1   0    1    000 0 0000 0 1 0
+
+
+74011368
+ccbe0b38
+b38b38b3
+8b38b38b
+38b38b38
+b38b38b3
+8b38b38b
+38b38b38
+b38b38b3
+8b38b38b
+38b38b38
+b38b38b3
+8b38b38b
+3cb38000
+
+
+MARS MSW: 74011368   
+MARS Mid 13: CCBE2802
+mars int2 : 80280280 
+mars int2 : 28028028 
+mars int2 : 02802802 
+mars int2 : 80280280 
+mars int2 : 28028028 
+mars int2 : 02802802 
+mars int2 : 80280280 
+mars int2 : 28028028 
+mars int2 : 02802802 
+mars int2 : 80280280 
+mars int2 : 28028028 
+mars int2 : 04800000 
+
+ccbe0800
+
+1100110 0101111100 000100000000000
+
+
+
+
+
+These work!
+
+Settings for channel 0, chip 0
+
+pa=17c
+pb=66
+rm=1
+senfl1=0
+senfl2=1
+m0=1
+m1=0
+sbn=1
+sb=1
+sl=0
+ts=2
+rt=0
+spur=0
+sse=0
+tr=1
+ss=0
+c=a
+g=2
+slh=0
+sp=1
+saux=1
+sbm=1
+tm=0
+
+dp=0
+nc1=0
+da=0
+sel=1
+nc2=0
+sm=0
+st=1
+74a11368
+ccbe0800
+80080080
+8008008
+800800
+80080080
+8008008
+800800
+80080080
+8048008
+800800
+80080080
+8008008
+4800000
+
+
+
