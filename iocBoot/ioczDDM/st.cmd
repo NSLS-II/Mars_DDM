@@ -7,6 +7,7 @@
 
 ## Environment specific macros
 #< unique.hex
+#< unique.xpd
 < unique.test
 
 cd "${TOP}"
