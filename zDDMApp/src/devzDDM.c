@@ -546,7 +546,15 @@ STATIC long zDDM_init(int after)
 	ad9252_cnfg(3,22,8); /* clock skew adjust */
 	ad9252_cnfg(3,255,1); /* latch regs */
 	//fpgabase[MARS_RDOUT_ENB]=0x8aaa; /* Enable all ASIC outputs to FPGA */
-        pl_register_write(fd,MARS_RDOUT_ENB,0x8aaa);	
+  if (192 == zDDM_NCHAN)
+  {
+      pl_register_write(fd,MARS_RDOUT_ENB, 0x8aaa);
+  }
+  else
+  {
+      pl_register_write(fd,MARS_RDOUT_ENB, 0x8fff);
+  }
+
 	FASTUNLOCK(&fpga_write_lock);
 	Debug(3,"zDDM_init: zDDM %i initialized\n\r",0);
 	return(0);

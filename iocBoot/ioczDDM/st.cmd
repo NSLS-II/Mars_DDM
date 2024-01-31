@@ -19,11 +19,11 @@ devI2CConfig(0,74,8)
 devI2CConfig(1,8,8)
 devI2CConfig(2,9,8)
 ##devSPIConfig(0,1,8)
-devzDDMConfig(1,1,192)
+devzDDMConfig(1,1,$(NELM))
 
 ## Load record instances
 #dbLoadTemplate "db/user.substitutions"
-dbLoadRecords("db/det1.db","P=$(P),R=$(R)")
+dbLoadRecords("db/det1.db","P=$(P),R=$(R),NELM=$(NELM)")
 dbLoadRecords "db/i2cDacs.db","P=$(P),R=$(R)")
 dbLoadRecords "db/i2cAdcs.db","P=$(P),R=$(R)")
 dbLoadRecords "db/Tmp100.db","P=$(P),R=$(R)")
