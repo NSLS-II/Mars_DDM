@@ -2,6 +2,8 @@ syntax: glob
 db/*
 dbd/*
 bin/
+include/
+lib/
 O.*
 as/*
 *~
