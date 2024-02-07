@@ -109,3 +109,5 @@ volatile unsigned int loads[12][14];
 /*epicsMutexId  SPI_lock;  */     /* SPI is shared resource; lock accesses */
 
 /*epicsMutexId  fpga_write_lock;  */     /* fpga registers are shared */
+
+void frame_done(int signum);

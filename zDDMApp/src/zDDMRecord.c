@@ -52,11 +52,13 @@ extern epicsTimerQueueId	zDDMWdTimerQ;
 #include	<special.h>
 #include 	<iocsh.h>
 #include	<epicsExport.h>
+#include <errlog.h>
 #define GEN_SIZE_OFFSET
 #include	"zDDMRecord.h"
 #undef GEN_SIZE_OFFSET
 #include	"devzDDM.h"
 //#include	<zmq.h>
+#include "pl_lib.h"
 
 #define zDDM_STATE_IDLE 0
 #define zDDM_STATE_WAITING 1

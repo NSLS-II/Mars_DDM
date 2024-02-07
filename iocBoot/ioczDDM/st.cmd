@@ -3,9 +3,8 @@
 ## You may have to change zDDM to something else
 ## everywhere it appears in this file
 
-< envPaths
 
-## Environment specific macros
+## Environment/beamline specific macros
 #< unique.hex
 #< unique.xpd
 < unique.test

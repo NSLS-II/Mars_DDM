@@ -167,6 +167,7 @@ STATIC long zDDM_reset(struct zDDMRecord *pscal);
 STATIC long zDDM_write_preset(zDDMRecord *psr, int val);
 STATIC long zDDM_arm(struct zDDMRecord *pscal, int val);
 STATIC long zDDM_done(zDDMRecord *pscal);
+int ad9252_cnfg(int chipNum, int addr, int data);
 
 det_DSET devzDDM = {
 	9, 

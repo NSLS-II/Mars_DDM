@@ -1,3 +1,0 @@
-epicsEnvSet("IOC","ioczDDM")
-epicsEnvSet("TOP","/epics/iocs/Mars_DDM")
-epicsEnvSet("EPICS_BASE","/root/epics/base")

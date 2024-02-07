@@ -1,4 +1,5 @@
 #include <linux/ioctl.h>
+#include <stdint.h>
 
 #define TRIGGER_DMA_TRANSFER _IO('p', 1)
 #define DMA_STATUS           _IOR('p', 2, pldrv_io_t *)

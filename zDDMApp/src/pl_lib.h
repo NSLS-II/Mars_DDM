@@ -1,4 +1,5 @@
-#include "../include/pl_ioctl.h"
+#include <stdint.h>
+#include "pl_ioctl.h"
 
 #define DEVNAME "/dev/vipic"
 #define PAGE_SIZE 4096
