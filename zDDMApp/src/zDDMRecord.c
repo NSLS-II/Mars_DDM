@@ -52,13 +52,14 @@ extern epicsTimerQueueId	zDDMWdTimerQ;
 #include	<special.h>
 #include 	<iocsh.h>
 #include	<epicsExport.h>
-#include <errlog.h>
+#include        <errlog.h>
 #define GEN_SIZE_OFFSET
 #include	"zDDMRecord.h"
 #undef GEN_SIZE_OFFSET
 #include	"devzDDM.h"
 //#include	<zmq.h>
-#include "pl_lib.h"
+#include        "pl_lib.h"
+#include        "pl.h"
 
 #define zDDM_STATE_IDLE 0
 #define zDDM_STATE_WAITING 1
@@ -69,40 +70,40 @@ extern epicsTimerQueueId	zDDMWdTimerQ;
 #define USER_STATE_REQSTART 2
 #define USER_STATE_COUNTING 3
 
-#define MARS_CONF_LOAD 0
-#define LEDS 1
-#define MARS_CONFIG 2
-#define VERSIONREG 3
-#define MARS_CALPULSE 4
-#define MARS_PIPE_DELAY 5
-#define MARS_RDOUT_ENB 8 
-#define EVENT_TIME_CNTR 9
-#define SIM_EVT_SEL 10
-#define SIM_EVENT_RATE 11
-#define ADC_SPI 12
-#define CALPULSE_CNT 16
-#define CALPULSE_RATE 17
-#define CALPULSE_WIDTH 18
-#define CALPULSE_MODE 19
-#define TD_CAL 20
-#define EVENT_FIFO_DATA 24
-#define EVENT_FIFO_CNT 25
-#define EVENT_FIFO_CNTRL 26
-#define DMA_CONTROL 32
-#define DMA_STATUS 33
-#define DMA_BASEADDR 34
-#define DMA_BURSTLEN 35
-#define DMA_BUFLEN 36
-#define DMA_CURADDR 37
-#define DMA_THROTTLE 38
-#define UDP_IP_ADDR 40
-#define DMA_IRQ_THROTTLE 48
-#define DMA_IRQ_ENABLE 49
-#define DMA_IRQ_COUNT 50
-#define TRIG  52
-#define COUNT_TIME 53
-#define FRAME_NO  54
-#define COUNT_MODE 55
+//#define MARS_CONF_LOAD 0
+//#define LEDS 1
+//#define MARS_CONFIG 2
+//#define VERSIONREG 3
+//#define MARS_CALPULSE 4
+//#define MARS_PIPE_DELAY 5
+//#define MARS_RDOUT_ENB 8 
+//#define EVENT_TIME_CNTR 9
+//#define SIM_EVT_SEL 10
+//#define SIM_EVENT_RATE 11
+//#define ADC_SPI 12
+//#define CALPULSE_CNT 16
+//#define CALPULSE_RATE 17
+//#define CALPULSE_WIDTH 18
+//#define CALPULSE_MODE 19
+//#define TD_CAL 20
+//#define EVENT_FIFO_DATA 24
+//#define EVENT_FIFO_CNT 25
+//#define EVENT_FIFO_CNTRL 26
+//#define DMA_CONTROL 32
+//#define DMA_STATUS 33
+//#define DMA_BASEADDR 34
+//#define DMA_BURSTLEN 35
+//#define DMA_BUFLEN 36
+//#define DMA_CURADDR 37
+//#define DMA_THROTTLE 38
+//#define UDP_IP_ADDR 40
+//#define DMA_IRQ_THROTTLE 48
+//#define DMA_IRQ_ENABLE 49
+//#define DMA_IRQ_COUNT 50
+//#define TRIG  52
+//#define COUNT_TIME 53
+//#define FRAME_NO  54
+//#define COUNT_MODE 55
 
 #ifdef NODEBUG
 #define Debug(l,FMT,V) ;
@@ -735,7 +736,14 @@ static long process(zDDMRecord *pscal)
                         if (pscal->us == USER_STATE_REQSTART) {
                                 Debug(5, "process: start counting %d\n",0);
                                 (*pdset->reset)(pscal);
-                                pscal->pr1 = (unsigned long)(pscal->tp * pscal->freq);
+#if EPICS_VERSION > 3 || EPICS_VERSION == 3 && EPICS_REVISION > 15
+                                pscal->pr1 = (uint64_t)(pscal->tp) * pscal->freq;
+				printf("Write1 %llu to register COUNT_TIME\n", pscal->pr1);
+#else
+                                pscal->pr1 = (float)(pscal->tp) * pscal->freq;
+				printf("Write1 %f to register COUNT_TIME\n", pscal->pr1);
+#endif
+				//printf("TP = %f, FRFEQ = %f\n", pscal->tp, pscal->freq);
                                 (*pdset->write_preset)(pscal, pscal->pr1);
                                 Debug(5, "process: Arming scaler %d\n",0);
                                 (*pdset->arm)(pscal, 1);
@@ -823,6 +831,9 @@ static long process(zDDMRecord *pscal)
                          */
                         (*pdset->reset)(pscal);
                         if (pscal->tp1 >= 1.e-3) {
+                		//printf("Write2 %d (%lu) to register COUNT_TIME\n", 
+				//       (unsigned long)(pscal->tp1*pscal->freq),
+				//       (unsigned long)(pscal->tp1*pscal->freq));
                                 (*pdset->write_preset)(pscal, (unsigned long)(pscal->tp1*pscal->freq));
                         }
                         (*pdset->arm)(pscal, 1);
@@ -1032,6 +1043,7 @@ static long special(dbAddr *paddr, int after)
         case zDDMRecordPR1:
                 /* convert clock ticks to time */
                 pscal->tp = (double)(pscal->pr1 / pscal->freq);
+		//printf("Freq = %d, time = %d, tp = %d\n", pscal->freq, pscal->pr1, pscal->tp);
                 db_post_events(pscal,&(pscal->tp),DBE_VALUE|DBE_ARCHIVE);
                 break;
 
@@ -1045,7 +1057,7 @@ static long special(dbAddr *paddr, int after)
                 pl_register_write(fd,FRAME_NO,pscal->runno);
 		//fpgabase[FRAME_NO]=pscal->runno;
 		Debug(2, "special: RUNNO %i\n", pscal->runno);
-               db_post_events(pscal,&(pscal->runno),DBE_VALUE|DBE_ARCHIVE);
+               //db_post_events(pscal,&(pscal->runno),DBE_VALUE|DBE_ARCHIVE);
                 break;
 
         case zDDMRecordPLDEL:

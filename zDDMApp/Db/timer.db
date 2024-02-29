@@ -1,0 +1,19 @@
+record(calc, "$(P)$(R):TIME_ELAPSED")
+{
+    field(INPA, "$(P)$(R).TP")
+    field(INPB, "$(P)$(R).CNT")
+    field(INPC, "$(P)$(R):TIME_ELAPSED")
+    field(CALC, "(B=0) ? 0 : ((C<A) ? (C+1) : A)")
+    field(FLNK, "$(P)$(R):TIME_LEFT")
+    field(SCAN, "1 second")
+}
+
+record(calc, "$(P)$(R):TIME_LEFT")
+{
+    field(INPA, "$(P)$(R).TP")
+    field(INPB, "$(P)$(R).CNT")
+    field(INPC, "$(P)$(R):TIME_ELAPSED")
+    field(INPD, "$(P)$(R):TIME_LEFT")
+    field(CALC, "(B=0) ? A : ((D>0) ? (A-C) : 0)")
+}
+

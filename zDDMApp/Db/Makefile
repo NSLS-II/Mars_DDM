@@ -12,6 +12,7 @@ DB += Tmp100.db
 DB += ZTMPAdcs.db
 #DB += user.substitutions
 DB += germDaemon.db
+DB += timer.db
 
 # If <anyname>.db template is not named <anyname>*.template add
 # <anyname>_TEMPLATE = <templatename>

@@ -3,11 +3,15 @@
 ## You may have to change zDDM to something else
 ## everywhere it appears in this file
 
+< envPaths
 
-## Environment/beamline specific macros
+## Environment specific macros
 #< unique.hex
 #< unique.xpd
 < unique.test
+
+epicsEnvSet("EPICS_CA_AUTO_ADDR_LIST", "NO")
+epicsEnvSet("EPICS_CA_ADDR_LIST", "172.16.0.211")
 
 cd "${TOP}"
 
@@ -28,6 +32,7 @@ dbLoadRecords "db/i2cAdcs.db","P=$(P),R=$(R)")
 dbLoadRecords "db/Tmp100.db","P=$(P),R=$(R)")
 dbLoadRecords "db/ZTMPAdcs.db","P=$(P),R=$(R)")
 ##dbLoadRecords "db/SpiDacs.db","user=det1"
+dbLoadRecords "db/timer.db","P=$(P),R=$(R)")
 
 
 ## Set this to see messages from mySub

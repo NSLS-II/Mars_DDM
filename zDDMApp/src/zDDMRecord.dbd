@@ -290,7 +290,7 @@ recordtype(zDDM) {
                 initial("1")
         }
 
-        field(PR1,DBF_ULONG) {
+        field(PR1,DBF_UINT64) {
                 prompt("Preset")
                 promptgroup(GUI_COMMON)
                 special(SPC_MOD)

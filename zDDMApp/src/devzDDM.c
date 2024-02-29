@@ -67,6 +67,7 @@ epicsTimerQueueId       TPgenTimerQ=0;
 #include	"zDDMRecord.h"
 #include	"devzDDM.h"
 #include	"pl_lib.h"
+#include        "pl.h"
 
 #define FAST_LOCK epicsMutexId
 #define FASTLOCKINIT(PFAST_LOCK) (*(PFAST_LOCK) = epicsMutexCreate())
@@ -104,39 +105,39 @@ epicsTimerQueueId       TPgenTimerQ=0;
 extern int zDDM_NCHAN;
 extern int zDDM_NCHIPS;
 
-#define MARS_CONF_LOAD 0
-#define LEDS 1
-#define MARS_CONFIG 2
-#define VERSIONREG 3
-#define MARS_CALPULSE 4
-#define MARS_PIPE_DELAY 5
-#define MARS_RDOUT_ENB 8 
-#define EVENT_TIME_CNTR 9
-#define SIM_EVT_SEL 10
-#define SIM_EVENT_RATE 11
-#define ADC_SPI 12
-#define CALPULSE_CNT 16
-#define CALPULSE_RATE 17
-#define CALPULSE_WIDTH 18
-#define CALPULSE_MODE 19
-#define TD_CAL 20
-#define EVENT_FIFO_DATA 24
-#define EVENT_FIFO_CNT 25
-#define EVENT_FIFO_CNTRL 26
-#define DMA_CONTROL 32
-#define DMA_STAT 33
-#define DMA_BASEADDR 34
-#define DMA_BURSTLEN 35
-#define DMA_BUFLEN 36
-#define DMA_CURADDR 37
-#define DMA_THROTTLE 38
-#define DMA_IRQ_THROTTLE 48
-#define DMA_IRQ_ENABLE 49
-#define DMA_IRQ_COUNT 50
-#define TRIG  52
-#define COUNT_TIME 53
-#define FRAME_NO  54
-#define COUNT_MODE 55
+//#define MARS_CONF_LOAD 0
+//#define LEDS 1
+//#define MARS_CONFIG 2
+//#define VERSIONREG 3
+//#define MARS_CALPULSE 4
+//#define MARS_PIPE_DELAY 5
+//#define MARS_RDOUT_ENB 8 
+//#define EVENT_TIME_CNTR 9
+//#define SIM_EVT_SEL 10
+//#define SIM_EVENT_RATE 11
+//#define ADC_SPI 12
+//#define CALPULSE_CNT 16
+//#define CALPULSE_RATE 17
+//#define CALPULSE_WIDTH 18
+//#define CALPULSE_MODE 19
+//#define TD_CAL 20
+//#define EVENT_FIFO_DATA 24
+//#define EVENT_FIFO_CNT 25
+//#define EVENT_FIFO_CNTRL 26
+//#define DMA_CONTROL 32
+//#define DMA_STAT 33
+//#define DMA_BASEADDR 34
+//#define DMA_BURSTLEN 35
+//#define DMA_BUFLEN 36
+//#define DMA_CURADDR 37
+//#define DMA_THROTTLE 38
+//#define DMA_IRQ_THROTTLE 48
+//#define DMA_IRQ_ENABLE 49
+//#define DMA_IRQ_COUNT 50
+//#define TRIG  52
+//#define COUNT_TIME 53
+//#define FRAME_NO  54
+//#define COUNT_MODE 55
 
 // #define SIMUL 1  /* For testing without hardware, define SIMUL */
 
@@ -164,7 +165,8 @@ STATIC long zDDM_reset(struct zDDMRecord *pscal);
 //#define zDDM_reset NULL
 //STATIC long zDDM_read(void *pscal);
 #define zDDM_read NULL
-STATIC long zDDM_write_preset(zDDMRecord *psr, int val);
+//STATIC long zDDM_write_preset(zDDMRecord *psr, float val);
+STATIC long zDDM_write_preset(zDDMRecord *psr);
 STATIC long zDDM_arm(struct zDDMRecord *pscal, int val);
 STATIC long zDDM_done(zDDMRecord *pscal);
 int ad9252_cnfg(int chipNum, int addr, int data);
@@ -226,17 +228,6 @@ CALLBACK *pcallbacks;
    callbackRequest(&pcallbacks[3]);
 }
 
-#define CMD_REG_READ  0
-#define CMD_REG_WRITE 1
-#define CMD_START_DMA 2
-
-#define FIFODATAREG 24
-#define FIFORDCNTREG 25
-#define FIFOCNTRLREG 26
-
-#define FRAMEACTIVEREG 52
-#define FRAMENUMREG 54
-#define FRAMELENREG 53 
 
 
 /*******************************************
@@ -288,12 +279,12 @@ void fifo_enable()
    FASTLOCK(&fpga_write_lock);
    
    /*read current value of register */
-   //rdback = fpgabase[FIFOCNTRLREG];
-   rdback=pl_register_read(fd,FIFOCNTRLREG);
+   //rdback = fpgabase[EVENT_FIFO_CNTRL];
+   rdback=pl_register_read(fd,EVENT_FIFO_CNTRL);
    
    newval = rdback | 0x1;
-   //fpgabase[FIFOCNTRLREG] = newval;
-   pl_register_write(fd,FIFOCNTRLREG,newval);
+   //fpgabase[EVENT_FIFO_CNTRL] = newval;
+   pl_register_write(fd,EVENT_FIFO_CNTRL,newval);
    
    FASTUNLOCK(&fpga_write_lock);
 
@@ -313,11 +304,11 @@ void fifo_disable()
    FASTLOCK(&fpga_write_lock);
    
    /* read current value of register */
-   //rdback = fpgabase[FIFOCNTRLREG];
-   rdback=pl_register_read(fd,FIFOCNTRLREG);
+   //rdback = fpgabase[EVENT_FIFO_CNTRL];
+   rdback=pl_register_read(fd,EVENT_FIFO_CNTRL);
    newval = rdback & 0x60;
-   //fpgabase[FIFOCNTRLREG] = newval;
-   pl_register_write(fd,FIFOCNTRLREG,newval);
+   //fpgabase[EVENT_FIFO_CNTRL] = newval;
+   pl_register_write(fd,EVENT_FIFO_CNTRL,newval);
    
    FASTUNLOCK(&fpga_write_lock);
 }
@@ -335,16 +326,16 @@ void fifo_reset()
    int rdback, newval;
    FASTLOCK(&fpga_write_lock);
    /* read current value of register */
-   //rdback = fpgabase[FIFOCNTRLREG];
-   rdback=pl_register_read(fd,FIFOCNTRLREG);
+   //rdback = fpgabase[EVENT_FIFO_CNTRL];
+   rdback=pl_register_read(fd,EVENT_FIFO_CNTRL);
    newval = rdback | 0x4;
    /* set reset high */
-   //fpgabase[FIFOCNTRLREG] = newval;
-   pl_register_write(fd,FIFOCNTRLREG,newval);
+   //fpgabase[EVENT_FIFO_CNTRL] = newval;
+   pl_register_write(fd,EVENT_FIFO_CNTRL,newval);
    /* set reset low */
    newval = rdback & 0x3;
-   //fpgabase[FIFOCNTRLREG] = newval;
-   pl_register_write(fd,FIFOCNTRLREG,newval);
+   //fpgabase[EVENT_FIFO_CNTRL] = newval;
+   pl_register_write(fd,EVENT_FIFO_CNTRL,newval);
    FASTUNLOCK(&fpga_write_lock);
 }
 
@@ -355,8 +346,8 @@ void fifo_reset()
 int check_framestatus()
 {
    /* read current value of register */
-   return pl_register_read(fd,FRAMEACTIVEREG);
-   //fpgabase[FRAMEACTIVEREG];
+   return pl_register_read(fd, TRIG);
+   //fpgabase[TRIG];
 
 }
 
@@ -369,8 +360,8 @@ int check_framestatus()
 int get_framenum()
 {
    /* read current value of register */
-   return pl_register_read(fd,FRAMENUMREG); 
-   //fpgabase[FRAMENUMREG];
+   return pl_register_read(fd, FRAME_NO); 
+   //fpgabase[FRAME_NO];
 
 }
 
@@ -384,8 +375,23 @@ int get_framenum()
 float get_framelen()
 {
    /* read current value of register */
-   return (float) pl_register_read(fd,FRAMELENREG)/ 25000000.0;
-   //fpgabase[FRAMELENREG]
+   //uint32_t count_time = pl_register_read(fd, COUNT_TIME);
+   //printf("Register COUNT_TIME = %d (0x%x)\n", count_time, count_time);
+   //return (float)count_time / 25000000;
+
+   //return (float) pl_register_read(fd, COUNT_TIME)/ 25000000.0;
+   //fpgabase[COUNT_TIME]
+
+   uint32_t count_time_lo, count_time_hi;
+   uint64_t count_time;
+   count_time_lo = pl_register_read(fd, COUNT_TIME_LO);
+   count_time_hi = pl_register_read(fd, COUNT_TIME_HI);
+   printf("Register COUNT_TIME_LO = %u (0x%x)\n", count_time_lo, count_time_lo);
+   printf("Register COUNT_TIME_HI = %u (0x%x)\n", count_time_hi, count_time_hi);
+   count_time = ((((uint64_t)count_time_hi) << 32) | count_time_lo);
+   printf("COUNT_TIME = %llu %f\n", count_time, (float)count_time);
+   return (float)((((uint64_t)count_time_hi) << 32) | count_time_lo);
+   
 }
 
 
@@ -395,8 +401,8 @@ float get_framelen()
 ******************************************/
 int fifo_numwords()
 {
-    return pl_register_read(fd,FIFORDCNTREG);
-    //fpgabase[FIFORDCNTREG];
+    return pl_register_read(fd, EVENT_FIFO_CNT);
+    //fpgabase[EVENT_FIFO_CNT];
 }
 
 
@@ -409,8 +415,8 @@ int fifo_getdata(int len, int *data)
 
    int i;
    for (i=0;i<len;i++) {
-      data[i] = pl_register_read(fd,FIFODATAREG);
-      //fpgabase[FIFODATAREG];
+      data[i] = pl_register_read(fd, EVENT_FIFO_DATA);
+      //fpgabase[EVENT_FIFO_DATA];
    }
    return 0;
 }
@@ -481,7 +487,7 @@ EPICSTHREADFUNC event_publish (struct zDDMRecord *psr)
 		   spct[i]=mca[monch*4096+i];
 		   }
                if(devzDDMdebug>=6){ 
-                printf("Total Events in Frame=%d\t Rate=%.1f\n",evttot,evtrate);
+                printf("Total Events in Frame=%d\t Rate=%.1f (%f seconds)\n", evttot, evtrate, framelen);
 		}
                 evttot = 0; 
        }
@@ -540,21 +546,31 @@ STATIC long zDDM_init(int after)
 
         FASTLOCK(&fpga_write_lock);
 	
-	ad9252_cnfg(1,22,8); /* clock skew adjust */
+	ad9252_cnfg(1,22,10); /* clock skew adjust */
 	ad9252_cnfg(1,255,1); /* latch regs */
 	ad9252_cnfg(2,22,8); /* clock skew adjust */
 	ad9252_cnfg(2,255,1); /* latch regs */
 	ad9252_cnfg(3,22,8); /* clock skew adjust */
 	ad9252_cnfg(3,255,1); /* latch regs */
 	//fpgabase[MARS_RDOUT_ENB]=0x8aaa; /* Enable all ASIC outputs to FPGA */
-  if (192 == zDDM_NCHAN)
-  {
-      pl_register_write(fd,MARS_RDOUT_ENB, 0x8aaa);
-  }
-  else
-  {
-      pl_register_write(fd,MARS_RDOUT_ENB, 0x8fff);
-  }
+#if EPICS_VERSION > 3
+        printf("PVA available\n");
+#elif EPICS_REVISION > 15
+        printf("INT64 available\n");
+#else
+        printf("INT64 unavailable\n");
+#endif
+
+        if (192 == zDDM_NCHAN)
+        {
+	    pl_register_write(fd, DETECTOR_TYPE, 0);
+            pl_register_write(fd, MARS_RDOUT_ENB, 0x8aaa);
+        }
+        else
+        {
+	    pl_register_write(fd, DETECTOR_TYPE, 1);
+            pl_register_write(fd, MARS_RDOUT_ENB, 0x8fff);
+        }
 
 	FASTUNLOCK(&fpga_write_lock);
 	Debug(3,"zDDM_init: zDDM %i initialized\n\r",0);
@@ -733,15 +749,37 @@ int i,j;
 }
 
 /* Write timer preset into register */
-STATIC long zDDM_write_preset(zDDMRecord *psr, int val)
+// val not needed as input. value from psr->pr1
+//STATIC long zDDM_write_preset(zDDMRecord *psr, float val)
+STATIC long zDDM_write_preset(zDDMRecord *psr)
 {
     Debug(2, "scaler_write_preset(): entry, after = %d\n\r", 1); 
     zDDMRecord *pdet = (zDDMRecord *)psr;
+    uint32_t pr1_lo, pr1_hi;
+    uint64_t pr1;
     
-    pdet->pr1=val;
+    //pdet->pr1=val;
     FASTLOCK(&fpga_write_lock);
+
+    // Obsolete because pr1 changed from int32 to uint64
     //fpgabase[COUNT_TIME]=pdet->pr1;
-    pl_register_write(fd,COUNT_TIME,pdet->pr1);
+
+//#if EPICS_VERSION>3 || EPICS_VERSION==3 && EPICS_REVISION>15
+    //pr1 = pdet->pr1;
+    //printf("pdet->pr1 = %llu\n", pdet->pr1);
+//#else
+    pr1 = (uint64_t)pdet->pr1;
+//#endif
+
+    //pr1_lo = (uint32_t)(pr1 & 0xffffffff);
+    //pr1_hi = (uint32_t)(pr1 >> 32);
+
+    printf("Write register COUNT_TIME_LO as %u\n", (uint32_t)(pr1 & 0xffffffff));
+    pl_register_write(fd,COUNT_TIME_LO, (uint32_t)(pr1 & 0xffffffff));
+
+    printf("Write register COUNT_TIME_HI as %u\n", (uint32_t)(pr1 >> 32));
+    pl_register_write(fd,COUNT_TIME_HI, (uint32_t)(pr1 >> 32));
+
     FASTUNLOCK(&fpga_write_lock);
     return(0);
 }

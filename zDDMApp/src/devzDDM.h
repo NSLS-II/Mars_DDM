@@ -3,6 +3,7 @@
 #define MAX_CHANNELS 384
 #define MAX_NCHIPS 12
 
+
 typedef struct{
 	long		number;
 	DEVSUPFUN	report;

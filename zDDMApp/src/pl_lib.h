@@ -1,4 +1,3 @@
-#include <stdint.h>
 #include "pl_ioctl.h"
 
 #define DEVNAME "/dev/vipic"
