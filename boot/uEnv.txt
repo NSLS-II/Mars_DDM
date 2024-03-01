@@ -7,7 +7,7 @@ mmcroot=/dev/mmcblk0p2 rw rootwait
 mmcrootfstype=ext4
 cmdline=earlyprintk ipv6.disable=1
 
-loadxbit=fatload mmc 0 ${btaddr} top_v20.18.bit; fpga loadb 0 ${btaddr} ${filesize}
+loadxbit=fatload mmc 0 ${btaddr} top_v20_ext_tp.bit; fpga loadb 0 ${btaddr} ${filesize}
 loadximage=load mmc 0:1 ${loadaddr} /zImage
 loadxfdt=load mmc 0:1 ${fdtaddr} /dtbs/${fdtfile}
 loadall=run loadxbit; run loadximage; run loadxfdt;
