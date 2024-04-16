@@ -546,7 +546,7 @@ STATIC long zDDM_init(int after)
 
         FASTLOCK(&fpga_write_lock);
 	
-	ad9252_cnfg(1,22,10); /* clock skew adjust */
+	ad9252_cnfg(1,22,9); /* clock skew adjust */
 	ad9252_cnfg(1,255,1); /* latch regs */
 	ad9252_cnfg(2,22,8); /* clock skew adjust */
 	ad9252_cnfg(2,255,1); /* latch regs */
