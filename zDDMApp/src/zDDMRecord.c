@@ -922,10 +922,10 @@ static void updateCounts(zDDMRecord *pscal)
 			spct[i]=mca[4096*pscal->monch+i];
 			}
 		}
-                        // db_post_events(pscal,pscal->pmca,DBE_VALUE|DBE_ARCHIVE);
-			// db_post_events(pscal,pscal->ptdc,DBE_VALUE|DBE_ARCHIVE);
-			// db_post_events(pscal,pscal->pspct,DBE_VALUE|DBE_ARCHIVE);
-        		// db_post_events(pscal,pscal->pintens,DBE_VALUE|DBE_ARCHIVE);
+                        db_post_events(pscal,pscal->pmca,DBE_VALUE|DBE_ARCHIVE);
+			db_post_events(pscal,pscal->ptdc,DBE_VALUE|DBE_ARCHIVE);
+			db_post_events(pscal,pscal->pspct,DBE_VALUE|DBE_ARCHIVE);
+        		db_post_events(pscal,pscal->pintens,DBE_VALUE|DBE_ARCHIVE);
 
         /* convert clock ticks to time. Note device support may have changed freq. */
 	/* freq is fixed in this device, so skip this bit */
@@ -1044,14 +1044,14 @@ static long special(dbAddr *paddr, int after)
         case zDDMRecordTP:
                 /* convert time to clock ticks */
                 pscal->pr1 = (unsigned long) (pscal->tp * pscal->freq);
-                // db_post_events(pscal,&(pscal->pr1),DBE_VALUE|DBE_ARCHIVE);
+                db_post_events(pscal,&(pscal->pr1),DBE_VALUE|DBE_ARCHIVE);
                 break;
 
         case zDDMRecordPR1:
                 /* convert clock ticks to time */
                 pscal->tp = (double)(pscal->pr1 / pscal->freq);
 		//printf("Freq = %d, time = %d, tp = %d\n", pscal->freq, pscal->pr1, pscal->tp);
-                // db_post_events(pscal,&(pscal->tp),DBE_VALUE|DBE_ARCHIVE);
+                db_post_events(pscal,&(pscal->tp),DBE_VALUE|DBE_ARCHIVE);
                 break;
 
         case zDDMRecordRATE:
@@ -1064,7 +1064,7 @@ static long special(dbAddr *paddr, int after)
                 pl_register_write(fd,FRAME_NO,pscal->runno);
 		//fpgabase[FRAME_NO]=pscal->runno;
 		Debug(2, "special: RUNNO %i\n", pscal->runno);
-                //db_post_events(pscal,&(pscal->runno),DBE_VALUE|DBE_ARCHIVE);
+                db_post_events(pscal,&(pscal->runno),DBE_VALUE|DBE_ARCHIVE);
                 break;
 
         case zDDMRecordPLDEL:
@@ -1072,7 +1072,7 @@ static long special(dbAddr *paddr, int after)
                 pl_register_write(fd,MARS_PIPE_DELAY, pscal->pldel);
 		//fpgabase[MARS_PIPE_DELAY]=pscal->pldel;
 		Debug(2, "special: PLDEL %i\n", pscal->pldel);
-               // db_post_events(pscal,&(pscal->pldel),DBE_VALUE|DBE_ARCHIVE);
+                db_post_events(pscal,&(pscal->pldel),DBE_VALUE|DBE_ARCHIVE);
                 break;
  
         case zDDMRecordRODEL:
@@ -1080,7 +1080,7 @@ static long special(dbAddr *paddr, int after)
                 pl_register_write(fd,TD_CAL,pscal->rodel);
 		//fpgabase[TD_CAL]=pscal->rodel;
 		Debug(2, "special: RODEL %i\n", pscal->rodel);
-               // db_post_events(pscal,&(pscal->rodel),DBE_VALUE|DBE_ARCHIVE);
+                db_post_events(pscal,&(pscal->rodel),DBE_VALUE|DBE_ARCHIVE);
                 break;
 
         case zDDMRecordMODE:
@@ -1102,7 +1102,7 @@ static long special(dbAddr *paddr, int after)
 		    }		
 		Debug(5, "special: COUNT_MODE %i\n", pscal->mode);
 		//Debug(5, "special: hardware COUNT_MODE %i\n", fpgabase[COUNT_MODE]);
-                // db_post_events(pscal,&(pscal->mode),DBE_VALUE|DBE_ARCHIVE);
+                db_post_events(pscal,&(pscal->mode),DBE_VALUE|DBE_ARCHIVE);
 		// db_post_events(pscal,&(pscal->cnt),DBE_VALUE|DBE_ARCHIVE);
                 break;
 
@@ -1163,7 +1163,7 @@ static long special(dbAddr *paddr, int after)
 		Debug(2, "special: GMON %i\n", pscal->gmon);
 		/* bits set by device support. Tell record to write hardware */
 		mars_modified=1;
-		// db_post_events(pscal,&(pscal->gmon),DBE_VALUE|DBE_ARCHIVE);
+		db_post_events(pscal,&(pscal->gmon),DBE_VALUE|DBE_ARCHIVE);
 		break;
 
 	case zDDMRecordMONCH: /* set channel which has monitor out enabled */
@@ -1216,7 +1216,7 @@ static long special(dbAddr *paddr, int after)
 		/* write hardware */
 		channelstr[pscal->monch].sel=pscal->loao;
 		mars_modified=1; 
-		// db_post_events(pscal,&(pscal->loao),DBE_VALUE|DBE_ARCHIVE);
+		db_post_events(pscal,&(pscal->loao),DBE_VALUE|DBE_ARCHIVE);
 		break;
 
 	case zDDMRecordEBLK: /* Enable on-chip bias current generator */
@@ -1234,7 +1234,7 @@ static long special(dbAddr *paddr, int after)
 			}
 		    }
 		mars_modified=1; 
-		// db_post_events(pscal,&(pscal->eblk),DBE_VALUE|DBE_ARCHIVE);
+		db_post_events(pscal,&(pscal->eblk),DBE_VALUE|DBE_ARCHIVE);
 		break;
 
 	case zDDMRecordTPAMP: /* Set test pulse amplitude */
@@ -1244,7 +1244,7 @@ static long special(dbAddr *paddr, int after)
 		    globalstr[chip].pb=pscal->tpamp;
 		    }
 		mars_modified=1; 
-		// db_post_events(pscal,&(pscal->tpamp),DBE_VALUE|DBE_ARCHIVE);
+		db_post_events(pscal,&(pscal->tpamp),DBE_VALUE|DBE_ARCHIVE);
 		break;
 	case zDDMRecordTPFRQ: /* Set test pulse frequency */
 		Debug(2, "special: TPFRQ\n %i", pscal->tpfrq);
@@ -1254,7 +1254,7 @@ static long special(dbAddr *paddr, int after)
 		pl_register_write(fd,CALPULSE_WIDTH,(25000000/pscal->tpfrq/2));
 		//fpgabase[CALPULSE_WIDTH]=25000000/pscal->tpfrq/2;
 		mars_modified=1; 
-		// db_post_events(pscal,&(pscal->tpfrq),DBE_VALUE|DBE_ARCHIVE);
+		db_post_events(pscal,&(pscal->tpfrq),DBE_VALUE|DBE_ARCHIVE);
 		break;
 	case zDDMRecordTPCNT: /* Set test pulse count */
 		Debug(2, "special: TPCNT\n %i", pscal->tpcnt);
@@ -1262,7 +1262,7 @@ static long special(dbAddr *paddr, int after)
 		pl_register_write(fd,CALPULSE_CNT,pscal->tpcnt);
 		//fpgabase[CALPULSE_CNT]=pscal->tpcnt;
 		mars_modified=1; 
-		// db_post_events(pscal,&(pscal->tpcnt),DBE_VALUE|DBE_ARCHIVE);
+		db_post_events(pscal,&(pscal->tpcnt),DBE_VALUE|DBE_ARCHIVE);
 		break;
 	case zDDMRecordTPENB: /* Enable test pulses */
 		Debug(2, "special: TPENB\n %i", pscal->tpenb);
@@ -1280,7 +1280,7 @@ static long special(dbAddr *paddr, int after)
 		  //fpgabase[CALPULSE_MODE]=0;
 		  }
 		mars_modified=1; 
-		// db_post_events(pscal,&(pscal->tpenb),DBE_VALUE|DBE_ARCHIVE);
+		db_post_events(pscal,&(pscal->tpenb),DBE_VALUE|DBE_ARCHIVE);
 		break;
 
 	case zDDMRecordSHPT: /* set shaping time */
@@ -1289,7 +1289,7 @@ static long special(dbAddr *paddr, int after)
 		    globalstr[chip].ts=pscal->shpt;
 		    }
 		mars_modified=1;
-		// db_post_events(pscal,&(pscal->shpt),DBE_VALUE|DBE_ARCHIVE);
+		db_post_events(pscal,&(pscal->shpt),DBE_VALUE|DBE_ARCHIVE);
 		break;
 
 	case zDDMRecordGAIN: /* set gain */
@@ -1298,7 +1298,7 @@ static long special(dbAddr *paddr, int after)
 		    globalstr[chip].g=pscal->gain;
 		    }
 		mars_modified=1;
-		// db_post_events(pscal,&(pscal->gain),DBE_VALUE|DBE_ARCHIVE);
+		db_post_events(pscal,&(pscal->gain),DBE_VALUE|DBE_ARCHIVE);
 		break;
 		
 	case zDDMRecordCHEN: /* load 'channel-disabled' array */ 
@@ -1306,7 +1306,7 @@ static long special(dbAddr *paddr, int after)
 		   channelstr[chan].sm=chen[chan];
 		   }
 		mars_modified=1;
-		// db_post_events(pscal,pscal->pchen,DBE_VALUE|DBE_ARCHIVE);/* post change */
+		db_post_events(pscal,pscal->pchen,DBE_VALUE|DBE_ARCHIVE);/* post change */
 		Debug(2, "special: CHEN %i\n", 0);
 		break;
 		
@@ -1316,7 +1316,7 @@ static long special(dbAddr *paddr, int after)
 		   }
 		mars_modified=1;
 		Debug(2, "special: TSEN %i\n", 0);
-		// db_post_events(pscal,pscal->ptsen,DBE_VALUE|DBE_ARCHIVE);
+		db_post_events(pscal,pscal->ptsen,DBE_VALUE|DBE_ARCHIVE);
 		break;
 		
 	case zDDMRecordTHTR:  /* array of NCHAN trim DAC values */
@@ -1325,7 +1325,7 @@ static long special(dbAddr *paddr, int after)
 		   }
 		mars_modified=1;
 		Debug(2, "special: THTR %i\n", 0);
-		// db_post_events(pscal,pscal->pthtr,DBE_VALUE|DBE_ARCHIVE);
+		db_post_events(pscal,pscal->pthtr,DBE_VALUE|DBE_ARCHIVE);
 		break;
 
 	case zDDMRecordPUTR:  /* array of NCHAN pileup threshold trim values */
@@ -1334,7 +1334,7 @@ static long special(dbAddr *paddr, int after)
 		   }
 		mars_modified=1;
 		Debug(2, "special: PUTR %i\n", 0);
-		// db_post_events(pscal,pscal->pputr,DBE_VALUE|DBE_ARCHIVE);
+		db_post_events(pscal,pscal->pputr,DBE_VALUE|DBE_ARCHIVE);
 		break;
 
 	case zDDMRecordPUEN: /* Pileup Rejection enable */
@@ -1343,7 +1343,7 @@ static long special(dbAddr *paddr, int after)
 		    }
 		mars_modified=1;
 		Debug(2, "special: PUEN %i\n", pscal->puen);
-		// db_post_events(pscal,&(pscal->puen),DBE_VALUE|DBE_ARCHIVE);
+		db_post_events(pscal,&(pscal->puen),DBE_VALUE|DBE_ARCHIVE);
 		break;
 						
 	case zDDMRecordMFS: /* Multi-fire suppression */
@@ -1352,7 +1352,7 @@ static long special(dbAddr *paddr, int after)
 		    }
 		mars_modified=1;
 		Debug(2, "special: MFS %i\n", pscal->mfs);
-		// db_post_events(pscal,&(pscal->mfs),DBE_VALUE|DBE_ARCHIVE);
+		db_post_events(pscal,&(pscal->mfs),DBE_VALUE|DBE_ARCHIVE);
 		break;
 
         case zDDMRecordTDS: /* set time detector slope */
@@ -1393,7 +1393,7 @@ static long special(dbAddr *paddr, int after)
 
 		mars_modified=1;
 	        Debug(2, "special: TDS %i\n", pscal->tds);
-	        // db_post_events(pscal,&(pscal->tds),DBE_VALUE|DBE_ARCHIVE);
+	        db_post_events(pscal,&(pscal->tds),DBE_VALUE|DBE_ARCHIVE);
 	        break;
 
 	case zDDMRecordTDM: /* set TDC mode */
@@ -1402,7 +1402,7 @@ static long special(dbAddr *paddr, int after)
 		    }	
 		mars_modified=1;
 		Debug(2, "special: TDM %i\n", 0);
-		// db_post_events(pscal,&(pscal->tdm),DBE_VALUE|DBE_ARCHIVE);
+		db_post_events(pscal,&(pscal->tdm),DBE_VALUE|DBE_ARCHIVE);
 		break;
 
 	case zDDMRecordTHRSH: /* Threshold */
@@ -1411,7 +1411,7 @@ static long special(dbAddr *paddr, int after)
 		    }	
 		mars_modified=1;
 		Debug(2, "special: THRSH %i\n", 0);
-		// db_post_events(pscal,pscal->pthrsh,DBE_VALUE|DBE_ARCHIVE);
+		db_post_events(pscal,pscal->pthrsh,DBE_VALUE|DBE_ARCHIVE);
 		break;
 
 	case zDDMRecordIPADDR: /* Fast channel IP address */
@@ -1431,7 +1431,7 @@ static long special(dbAddr *paddr, int after)
 		pl_register_write(fd,UDP_IP_ADDR,addr);
 		//fpgabase[UDP_IP_ADDR] = addr;
 		Debug(2, "special: decimal address %i\n", addr);
-		// db_post_events(pscal,pscal->ipaddr,DBE_VALUE|DBE_ARCHIVE);
+		db_post_events(pscal,pscal->ipaddr,DBE_VALUE|DBE_ARCHIVE);
 		break;
 		
 	default:
